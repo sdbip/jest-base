@@ -1,0 +1,16 @@
+{
+  "name": "disk-analysis",
+  "author": "Johan Segerfeldt <johan.segerfeldt@me.com>",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "typescript": "^4.5.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "jest": "^27.4.3",
+    "ts-jest": "^27.0.7"
+  }
+}
