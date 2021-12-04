@@ -4,6 +4,9 @@
 		{
 			"type": "npm",
 			"script": "test",
+			"presentation": {
+				"clear": true
+			},
 			"group": {
 				"kind": "build",
 				"isDefault": true
