@@ -7,6 +7,17 @@
 			"presentation": {
 				"clear": true
 			},
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: test",
+			"detail": "jest"
+		},
+		{
+			"type": "shell",
+			"command": "./test.sh",
+			"presentation": {
+				"clear": true
+			},
 			"group": {
 				"kind": "build",
 				"isDefault": true
