@@ -1,2 +1,4 @@
 #!/bin/bash
-npx ts-node .build/runtests $*
+while npx ts-node .build/runtests $*; do
+	echo "Restarting..."
+done

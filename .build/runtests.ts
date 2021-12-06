@@ -5,25 +5,23 @@ import { StaticAnalysis } from './StaticAnalysis'
 import { TestReport } from './TestReport'
 
 const watch = (process.argv.indexOf('--watch') >= 0)
-let isRunning = false
-runTests().then(() => {
-  if (!watch) return
-  
-  fs.watch('.build/', (eventType, filename: string) => {
+if (watch) {
+
+  fs.watch('.build/', (eventType, filename) => {
     if (filename.startsWith('.')) return
     console.log(eventType, filename)
     console.log(styled([ANSI.bold, ANSI.red, ANSI.whiteBg]), '🛠 Build files changed 🔌')
-    process.exit(1)
+    process.exit(0)
   })
-  
-  fs.watch('./', { recursive: true }, async (eventType, filename: string) => {
-    if (filename.startsWith('.') || isRunning) return
-    isRunning = true
+
+  fs.watch('./', { recursive: true }, async (eventType, filename) => {
+    if (filename.startsWith('.')) return
     console.log(eventType, filename)
-    await runTests()
-    isRunning = false
-  })  
-})
+    process.exit(0)
+  })
+}
+
+runTests()
 
 
 async function runTests() {
