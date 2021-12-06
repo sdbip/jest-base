@@ -4,9 +4,10 @@ import { Sound } from './Sound'
 import { StaticAnalysis } from './StaticAnalysis'
 import { TestReport } from './TestReport'
 
-const watch = (process.argv.indexOf('--watch') >= 0)
-if (watch) {
+const watchForSourceChanges = (process.argv.indexOf('--watch') >= 0)
+const includeBuildSource = process.argv.indexOf('--lint_build') > 0
 
+if (watchForSourceChanges) {
   fs.watch('.build/', (eventType, filename) => {
     if (filename.startsWith('.')) return
     console.log(eventType, filename)
@@ -32,7 +33,7 @@ async function runTests() {
   console.log('\n\n')
   testResult.report()
 
-  const lintResult = await StaticAnalysis.run()
+  const lintResult = await StaticAnalysis.run({includeBuildSource})
   lintResult.report()
 
   console.log('\n\n')

@@ -1,37 +1,31 @@
-import { ESLint } from 'eslint'
+import { ESLint, Linter } from 'eslint'
 import { ANSI, styled } from './ansi-styles'
 
 export class StaticAnalysis {
-  readonly lintErrors: ESLint.LintResult[]
-  get hasIssues() { return this.lintErrors.length > 0 }
+  get hasIssues() { return this.issues.length > 0 }
+  private readonly issues: ESLint.LintResult[]
 
-  constructor(lintErrors: ESLint.LintResult[]) {
-    this.lintErrors = lintErrors
+  constructor(issues: ESLint.LintResult[]) {
+    this.issues = issues
   }
 
-  static async run() {
-    const lintedFiles = '**/*.ts' // Use ['**/*.ts', '.build/**/*.ts'] to include the build scripts
-    const lintResult = await new ESLint().lintFiles(lintedFiles)
-
-    return new StaticAnalysis(lintResult.filter(x => x.errorCount || x.warningCount))
+  static async run({includeBuildSource}: {includeBuildSource: boolean}) {
+    const sources = includeBuildSource ? ['**/*.ts', '.build/**/*.ts'] : '**/*.ts'
+    const result = await new ESLint().lintFiles(sources)
+    return new StaticAnalysis(result.filter(x => x.errorCount || x.warningCount))
   }
 
   report() {
     console.log(
-      styled(this.hasIssues ? styles.lintIssue : styles.prettyCode),
+      styled(this.hasIssues ? styles.issue : styles.ok),
       this. hasIssues ? '🧹 Code needs cleanup 🧹' : '🧹 Code looks beautiful 🧹')
 
-    for (const err of this.lintErrors) {
+    for (const err of this.issues) {
       console.error(`\n${err.filePath}`)
       for (const msg of err.messages) {
-
         console.error(
           styled(ANSI.gray, `  ${msg.line}:${msg.column}`),
-          msg.severity == Level.error
-            ? styled(ANSI.red, 'error')
-            : msg.severity == Level.warn
-              ? styled(ANSI.yellow, 'warning')
-              : 'info',
+          severityString(msg),
           msg.message,
           styled(ANSI.gray, msg.ruleId ?? undefined))
       }
@@ -42,6 +36,14 @@ export class StaticAnalysis {
 export enum Level { ok, warn, error }
 
 const styles = {
-  lintIssue: [ANSI.bold, ANSI.yellow],
-  prettyCode: [ANSI.bold, ANSI.blue],
+  issue: [ANSI.bold, ANSI.yellow],
+  ok: [ANSI.bold, ANSI.blue],
+}
+
+function severityString(msg: Linter.LintMessage): string {
+  return msg.severity == Level.error
+    ? styled(ANSI.red, 'error')
+    : msg.severity == Level.warn
+      ? styled(ANSI.yellow, 'warning')
+      : 'info'
 }
